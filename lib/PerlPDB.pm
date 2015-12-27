@@ -86,6 +86,16 @@ sub search {
 
 sub search_protsym{
     # Protein symmetry search of the PDB
+    my ($point_group, $min_rmsd, $max_rmsd) = @_;
+    if( ! $min_rmsd ) { $min_rmsd = 0.0; }
+    if( ! $max_rmsd ) { $max_rmsd = 7.0; }
+
+    my %query = (
+        'queryType' => 'PointGroupQuery',
+        'rMSDComparator' => 'between',
+        'pointGroup' => $point_group,
+        'rMSDMin' => $min_rmsd,
+        'rMSDMax' => $max_rmsd);
 }
 
 search(make_search_query('actin'));
