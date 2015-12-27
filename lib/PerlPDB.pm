@@ -152,11 +152,21 @@ sub get_raw_blast {
     # Look up full BLAST page for a given PDB ID
     # get_blast() uses this function internally
     my ($pdb_id, %kwargs) = @_;
-    if( ! $kwargs{output_form} ) { $kwargs{output_form} = 'HTML'; }
+    if( ! $kwargs{output_form} or $kwargs{output_form} !~ /^(TXT|HTML|XML)$/i ) { $kwargs{output_form} = 'HTML'; }
     if( ! $kwargs{chain_id} ) { $kwargs{chain_id} = 'A'; }
 
+    my $url = URI->new( 'http://www.rcsb.org/pdb/rest/getBlastPDB2' );
+    $url->query_form( 'structureId' => $pdb_id,
+                      'chainId' => $kwargs{chain_id},
+                      'outputFormat' => $kwargs{output_form} );
+
+    my $response = LWP::UserAgent->new->get( $url );
+    my $result = $response->content;
+
+    return $result;
 }
 
+get_raw_blast('4LZA', output_form=>'txt');
 print get_pdbid_info('4LZA');
 
 1;
