@@ -130,11 +130,20 @@ sub get_pdbid_file {
     # Get the full PDB file associated with a PDB_ID
     my ($pdb_id, $file_type, $compression) = @_;
     if( ! $file_type or $file_type !~ /^(pdb|cif|xml|structfact)$/ ) { $file_type = 'pdb'; }
-    if( ! $compression or $compression = 'false') { $compression = 'NO'; }
+    if( ! $compression or $compression =~ /^false$/i ) { $compression = 'NO'; }
     else { $compression = 'YES'; }
 
+    my $url = URI->new( 'http://www.rcsb.org/pdb/download/downloadFile.do' );
+    $url->query_form( 'fileFormat' => $file_type,
+                      'compression' => $compression,
+                      'structureId' => $pdb_id );
+
+    my $response = LWP::UserAgent->new->get( $url );
+    my $result = $response->content;
+
+    return $result;
 }
 
-get_pdbid_info('2FFW');
+get_pdbid_file('2FFW', 'xml', 'true');
 
 1;
