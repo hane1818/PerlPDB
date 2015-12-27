@@ -115,13 +115,14 @@ sub get_all_pdbid {
 }
 
 sub get_pdbid_info {
-    # Look up all information about a given PDB ID
-    my ($pdb_id, $url) = @_;
-    if( ! $url ) { $url = 'http://www.rcsb.org/pdb/rest/describeMol'; }
-    $url = URI->new( $url );
+    # Look up all information in RCSB PDB about a given PDB ID
+    my ($pdb_id) = @_;
+    my $url = URI->new( 'http://www.rcsb.org/pdb/rest/describeMol' );
+    $url->query_form( 'structureId' => $pdb_id );
 
+    my $response = LWP::UserAgent->new->get( $url );
 }
 
-print get_all_pdbid();
+get_pdbid_info('2FFW');
 
 1;
