@@ -121,6 +121,9 @@ sub get_pdbid_info {
     $url->query_form( 'structureId' => $pdb_id );
 
     my $response = LWP::UserAgent->new->get( $url );
+    my $result = XMLin( $response->content );
+
+    return % { $result };
 }
 
 get_pdbid_info('2FFW');
