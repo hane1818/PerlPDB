@@ -126,6 +126,15 @@ sub get_pdbid_info {
     return % { $result };
 }
 
+sub get_pdbid_file {
+    # Get the full PDB file associated with a PDB_ID
+    my ($pdb_id, $file_type, $compression) = @_;
+    if( ! $file_type or $file_type !~ /^(pdb|cif|xml|structfact)$/ ) { $file_type = 'pdb'; }
+    if( ! $compression or $compression = 'false') { $compression = 'NO'; }
+    else { $compression = 'YES'; }
+
+}
+
 get_pdbid_info('2FFW');
 
 1;
