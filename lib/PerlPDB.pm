@@ -104,9 +104,15 @@ sub search_protsym{
 
 sub get_all_pdbid{
     # Get all PDB entries currently in the RCSB Protein Data Bank
+    my $url = 'http://www.rcsb.org/pdb/rest/getCurrent';
+    my $request = HTTP::Request->new( GET => $url);
+    my $response = LWP::UserAgent->new->request( $request );
 
+    my @results = $response->content =~ /structureId=\"(.+)\"/g;
+
+    return @results;
 }
 
-print search_protsym('C9', 0.0 , 1.0);
+print get_all_pdbid();
 
 1;
