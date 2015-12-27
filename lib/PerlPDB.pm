@@ -10,6 +10,9 @@ our @EXPORT_OK  = qw(
     make_search_query
     );
 
+use XML::Simple;
+use LWP::UserAgent;
+
 sub make_search_query {
     my ($key, $type)=@_;
 
@@ -59,11 +62,28 @@ sub make_search_query {
     my %scan_param;
     $scan_param{'orgPdbQuery'} = {%query};
 
-    return %scan_param;
+    return %query;
 }
 
 sub search {
-    my %scan_param = @_;
+    my %query = @_;
+    my $url = 'http://www.rcsb.org/pdb/rest/search';
+    my $xml_root = 'orgPdbQuery';
+    my $xml = {%query};
+    my $queryText = XMLout($xml, NoAttr=>1, RootName=>$xml_root);
+
+    my $request = HTTP::Request->new( POST => $url);
+    $request->content_type( 'application/x-www-form-urlencoded' );
+    $request->content( $queryText );
+
+    my $response = LWP::UserAgent->new->request( $request );
+    my $result = $response->content;
+    if( ! $result ) { warn("No result"); }
+    my @id_list = split("\n", $result);
+
+    return @id_list;
 }
+
+search(make_search_query('actin'));
 
 1;
