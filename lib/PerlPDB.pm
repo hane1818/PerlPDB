@@ -13,6 +13,7 @@ our @EXPORT_OK  = qw(
 use XML::Simple;
 use LWP::UserAgent;
 use URI;
+use Data::Dumper;
 
 sub make_search_query {
     my ($key, $type)=@_;
@@ -121,7 +122,7 @@ sub get_pdbid_info {
     $url->query_form( 'structureId' => $pdb_id );
 
     my $response = LWP::UserAgent->new->get( $url );
-    my $result = XMLin( $response->content );
+    my $result = XMLin( $response->content , KeepRoot => 1);
 
     return % { $result };
 }
@@ -144,6 +145,14 @@ sub get_pdbid_file {
     return $result;
 }
 
-get_pdbid_file('2FFW', 'xml', 'true');
+sub get_all_info {
+    # A wrapper for get_info that cleans up the output slighly
+    my ($pdb_id) = @_;
+    my %result = get_pdbid_info($pdb_id);
+
+    return % { $result{'molDescription'}{'structureId'} };
+}
+
+print get_all_info('4LZA');
 
 1;
