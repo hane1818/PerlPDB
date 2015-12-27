@@ -12,6 +12,7 @@ our @EXPORT_OK  = qw(
 
 use XML::Simple;
 use LWP::UserAgent;
+use URI;
 
 sub make_search_query {
     my ($key, $type)=@_;
@@ -84,7 +85,7 @@ sub search {
     return @id_list;
 }
 
-sub search_protsym{
+sub search_protsym {
     # Protein symmetry search of the PDB
     my ($point_group, $min_rmsd, $max_rmsd) = @_;
     if( ! $min_rmsd ) { $min_rmsd = 0.0; }
@@ -102,7 +103,7 @@ sub search_protsym{
     return @id_list;
 }
 
-sub get_all_pdbid{
+sub get_all_pdbid {
     # Get all PDB entries currently in the RCSB Protein Data Bank
     my $url = 'http://www.rcsb.org/pdb/rest/getCurrent';
     my $request = HTTP::Request->new( GET => $url);
@@ -111,6 +112,14 @@ sub get_all_pdbid{
     my @results = $response->content =~ /structureId=\"(.+)\"/g;
 
     return @results;
+}
+
+sub get_pdbid_info {
+    # Look up all information about a given PDB ID
+    my ($pdb_id, $url) = @_;
+    if( ! $url ) { $url = 'http://www.rcsb.org/pdb/rest/describeMol'; }
+    $url = URI->new( $url );
+
 }
 
 print get_all_pdbid();
