@@ -102,6 +102,11 @@ sub search_protsym{
     return @id_list;
 }
 
+sub get_all_pdbid{
+    # Get all PDB entries currently in the RCSB Protein Data Bank
+
+}
+
 print search_protsym('C9', 0.0 , 1.0);
 
 1;
