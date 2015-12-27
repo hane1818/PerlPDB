@@ -10,9 +10,17 @@ our @EXPORT_OK  = qw(
     make_search_query
     );
 
-sub make_search_query{
-    my (%query) = @_;
-    print "make_search_query\n";
+sub make_search_query {
+    my ($key, $type)=@_;
+    my @querytype = ('HoldingsQuery', 'ExpTypeQuery',
+                    'AdvancedKeywordQuery','StructureIdQuery',
+                    'ModifiedStructuresQuery', 'AdvancedAuthorQuery', 'MotifQuery',
+                    'NoLigandQuery');
+    if ( ! grep { $_ eq $type } @querytype) {
+        $type='AdvancedKeywordQuery'; }
+    my %query;
+    $query{'queryType'}=$type;
 }
 
+make_search_query('Hello', 'ohno');
 1;
