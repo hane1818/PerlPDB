@@ -7,7 +7,9 @@ use Exporter qw(import);
 our $VERSION    = 1.0;
 our @ISA        = qw(Exporter);
 our @EXPORT_OK  = qw(
-    make_search_query
+    make_search_query, search,
+    search_protsym, get_pdbid_info,
+    get_all_pdbid, get_pdbid_file,
     );
 
 use XML::Simple;
@@ -144,6 +146,15 @@ sub get_pdbid_file {
     my $result = $response->content;
 
     return $result;
+}
+
+sub get_raw_blast {
+    # Look up full BLAST page for a given PDB ID
+    # get_blast() uses this function internally
+    my ($pdb_id, %kwargs) = @_;
+    if( ! $kwargs{output_form} ) { $kwargs{output_form} = 'HTML'; }
+    if( ! $kwargs{chain_id} ) { $kwargs{chain_id} = 'A'; }
+
 }
 
 print get_pdbid_info('4LZA');
