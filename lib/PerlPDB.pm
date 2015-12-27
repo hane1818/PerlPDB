@@ -19,7 +19,7 @@ sub make_search_query {
                     'NoLigandQuery');
     my $querytype = join('|', @querytype);
     $querytype = '^('.$querytype.')$';
-    if ( $type !~ /$querytype/ ) {
+    if ( ! $type or $type !~ /$querytype/ ) {
         $type='AdvancedKeywordQuery'; }
 
     my %query;
@@ -60,6 +60,10 @@ sub make_search_query {
     $scan_param{'orgPdbQuery'} = {%query};
 
     return %scan_param;
+}
+
+sub search {
+    my %scan_param = @_;
 }
 
 1;
