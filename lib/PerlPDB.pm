@@ -96,8 +96,12 @@ sub search_protsym{
         'pointGroup' => $point_group,
         'rMSDMin' => $min_rmsd,
         'rMSDMax' => $max_rmsd);
+
+    my @id_list = search(%query);
+
+    return @id_list;
 }
 
-search(make_search_query('actin'));
+print search_protsym('C9', 0.0 , 1.0);
 
 1;
