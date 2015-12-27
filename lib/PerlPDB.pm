@@ -84,6 +84,10 @@ sub search {
     return @id_list;
 }
 
+sub search_protsym{
+    # Protein symmetry search of the PDB
+}
+
 search(make_search_query('actin'));
 
 1;
