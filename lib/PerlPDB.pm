@@ -62,5 +62,4 @@ sub make_search_query {
     return %scan_param;
 }
 
-make_search_query('Hello', 'ExpTypeQuery');
 1;
