@@ -18,7 +18,8 @@ sub make_search_query {
                     'ModifiedStructuresQuery', 'AdvancedAuthorQuery', 'MotifQuery',
                     'NoLigandQuery');
     my $querytype = join('|', @querytype);
-    if ( $type !~ $querytype ) {
+    $querytype = '^('.$querytype.')$';
+    if ( $type !~ /$querytype/ ) {
         $type='AdvancedKeywordQuery'; }
 
     my %query;
@@ -54,7 +55,12 @@ sub make_search_query {
         $query{'description'} = 'Experimental Method Search : Experimental Method=' . $key;
         $query{'mvStructure.expMethod.value'} = $key;
     }
+
+    my %scan_param;
+    $scan_param{'orgPdbQuery'} = {%query};
+
+    return %scan_param;
 }
 
-make_search_query('Hello', 'cc');
+make_search_query('Hello', 'ExpTypeQuery');
 1;
