@@ -197,6 +197,7 @@ sub parse_blast {
     }
     shift @blasts;
     shift @blast_ids;
+    return (@blast_ids, @blasts);
 }
 
 parse_blast(get_raw_blast('4LZA', chain_id=>'A', output_form=>'html'));
