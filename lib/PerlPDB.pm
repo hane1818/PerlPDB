@@ -197,10 +197,20 @@ sub parse_blast {
             }
         }
     }
-    return (@blast_ids, @blasts);
+    return ([@blast_ids], [@blasts]);
 }
 
-parse_blast(get_raw_blast('4LZA', chain_id=>'A', output_form=>'html'));
+sub get_blast {
+    # Alternative way to look up BLAST for a given PDB ID.
+    my ($pdb_id, %kwargs) = @_;
+    if ( ! $kwargs{chain_id} ) { $kwargs{chain_id} = 'A'; }
+    if ( ! $kwargs{output_form} ) { $kwargs{output_form} = 'HTML'; }
+
+    my @result = parse_blast( get_raw_blast( $pdb_id, $kwargs{chain_id}, $kwargs{output_form} ) );
+    return @result;
+}
+
+get_blast('4LZA', chain_id=>'A', output_form=>'html');
 #print get_pdbid_info('4LZA');
 
 1;
