@@ -16,6 +16,7 @@ use XML::Simple;
 use LWP::UserAgent;
 use URI;
 use Data::Dumper;
+use HTML::TokeParser;
 
 sub make_search_query {
     my ($key, %kwargs)=@_;
@@ -166,7 +167,39 @@ sub get_raw_blast {
     return $result;
 }
 
-get_raw_blast('4LZA', output_form=>'txt');
-print get_pdbid_info('4LZA');
+sub parse_blast {
+    my ($html) = @_;
+    my $parser = HTML::TokeParser->new( \$html );
+
+    my @blasts;
+    my @blast_ids;
+
+    while( my $token = $parser->get_token) {
+        my $ttype = shift @{ $token };
+        my $ttype2;
+        if($ttype eq 'S') {
+            my($tag, $attr, $attrseq, $rawtxt) = @{ $token };
+            if($tag eq 'pre') {
+                $parser->get_token;   #remove Text
+                my $token2 = $parser->get_token;
+                $ttype2 = shift @{ $token2 };
+                my($tag2, $attr, $attrseq, $rawtxt) = @{ $token2 };
+                if($ttype2 eq 'S' and $tag2 eq 'a')
+                {
+                    $parser->get_token;
+                    my $blast = $parser->get_token->[1];
+                    my $blast_id = substr($blast, 0, 4);
+                    push (@blasts, $blast);
+                    push (@blast_ids, $blast_id);
+                }
+            }
+        }
+    }
+    shift @blasts;
+    shift @blast_ids;
+}
+
+parse_blast(get_raw_blast('4LZA', chain_id=>'A', output_form=>'html'));
+#print get_pdbid_info('4LZA');
 
 1;
