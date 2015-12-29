@@ -27,37 +27,37 @@ sub make_search_query {
                     'NoLigandQuery');
     my $querytype = join('|', @querytype);
     $querytype = '^('.$querytype.')$';
-    if ( ! $kwargs{type} or $kwargs{type} !~ /$querytype/ ) {
+    if ( ! $kwargs{type} or $kwargs{type} !~ /$querytype/i ) {
         $kwargs{type}='AdvancedKeywordQuery'; }
 
     my %query;
     $query{'queryType'}=$kwargs{type};
-    if ( $kwargs{type} =~ /^AdvancedKeywordQuery$/ ) {
+    if ( $kwargs{type} =~ /^AdvancedKeywordQuery$/i ) {
 
         $query{'description'} = 'Text Search for: ' . $key;
         $query{'keywords'} = $key;
 
-    }elsif ( $kwargs{type} =~ /^NoLigandQuery$/ ) {
+    }elsif ( $kwargs{type} =~ /^NoLigandQuery$/i ) {
 
         $query{'haveLigands'} = 'yes';
 
-    }elsif ( $kwargs{type} =~ /^AdvancedAuthorQuery$/ ) {
+    }elsif ( $kwargs{type} =~ /^AdvancedAuthorQuery$/i ) {
 
         $query{'description'} = 'Author Name: ' . $key;
         $query{'searchType'} = 'All Authors';
         $query{'audit_author.name'} = $key;
         $query{'exactMatch'} = 'false';
 
-    }elsif ( $kwargs{type} =~ /^MotifQuery$/ ) {
+    }elsif ( $kwargs{type} =~ /^MotifQuery$/i ) {
 
         $query{'description'} = 'Motif Query For: ' . $key;
         $query{'motif'} = $key;
 
-    }elsif ( $kwargs{type} =~ /^(StructureIdQuery|ModifiedStructuresQuery)$/ ) {
+    }elsif ( $kwargs{type} =~ /^(StructureIdQuery|ModifiedStructuresQuery)$/i ) {
 
         $query{'structureIdList'} = $key;
 
-    }elsif ( $kwargs{type} =~ /^ExpTypeQuery$/ ) {
+    }elsif ( $kwargs{type} =~ /^ExpTypeQuery$/i ) {
 
         $query{'experimentalMethod'} = $key;
         $query{'description'} = 'Experimental Method Search : Experimental Method=' . $key;
@@ -134,9 +134,9 @@ sub get_pdbid_info {
 sub get_pdbid_file {
     # Get the full PDB file associated with a PDB_ID
     my ($pdb_id, %kwargs) = @_;
-    if( ! $kwargs{file_type} or $kwargs{file_type} !~ /^(pdb|cif|xml|structfact)$/ ) { $kwargs{file_type} = 'pdb'; }
-    if( ! $kwargs{compression} or $kwargs{compression} =~ /^false$/i ) { $kwargs{compression} = 'NO'; }
-    else { $kwargs{compression} = 'YES'; }
+    if( ! $kwargs{file_type} or $kwargs{file_type} !~ /^(pdb|cif|xml|structfact)$/i ) { $kwargs{file_type} = 'pdb'; }
+    if( ! $kwargs{compression} or $kwargs{compression} =~ /^(true|yes|y|t)$/i ) { $kwargs{compression} = 'YES'; }
+    else { $kwargs{compression} = 'NO'; }
 
     my $url = URI->new( 'http://www.rcsb.org/pdb/download/downloadFile.do' );
     $url->query_form( 'fileFormat' => $kwargs{file_type},
