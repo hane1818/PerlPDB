@@ -189,14 +189,14 @@ sub parse_blast {
                     $parser->get_token;
                     my $blast = $parser->get_token->[1];
                     my $blast_id = substr($blast, 0, 4);
-                    push (@blasts, $blast);
-                    push (@blast_ids, $blast_id);
+                    if( length($blast_id) == 4 ) {
+                        push (@blasts, $blast);
+                        push (@blast_ids, $blast_id);
+                    }
                 }
             }
         }
     }
-    shift @blasts;
-    shift @blast_ids;
     return (@blast_ids, @blasts);
 }
 
