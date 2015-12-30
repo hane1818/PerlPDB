@@ -13,6 +13,7 @@ our @EXPORT_OK  = qw(
     );
 
 use XML::Simple;
+use XML::Parser;
 use LWP::UserAgent;
 use URI;
 use Data::Dumper;
@@ -67,14 +68,14 @@ sub make_search_query {
     my %scan_param;
     $scan_param{'orgPdbQuery'} = {%query};
 
-    return %query;
+    return {%query};
 }
 
 sub search {
-    my %query = @_;
+    my ($query) = @_;
     my $url = 'http://www.rcsb.org/pdb/rest/search';
     my $xml_root = 'orgPdbQuery';
-    my $xml = {%query};
+    my $xml = $query;
     my $queryText = XMLout($xml, NoAttr=>1, RootName=>$xml_root);
 
     my $request = HTTP::Request->new( POST => $url);
@@ -86,7 +87,7 @@ sub search {
     if( ! $result ) { warn("No result"); }
     my @id_list = split("\n", $result);
 
-    return @id_list;
+    return [@id_list];
 }
 
 sub search_protsym {
@@ -102,9 +103,8 @@ sub search_protsym {
         'rMSDMin' => $kwargs{min_rmsd},
         'rMSDMax' => $kwargs{max_rmsd});
 
-    my @id_list = search(%query);
-
-    return @id_list;
+    my $id_list = search({%query});
+    return $id_list;
 }
 
 sub get_all_pdbid {
@@ -114,8 +114,7 @@ sub get_all_pdbid {
     my $response = LWP::UserAgent->new->request( $request );
 
     my @results = $response->content =~ /structureId=\"(.+)\"/g;
-
-    return @results;
+    return [@results];
 }
 
 sub get_pdbid_info {
@@ -128,7 +127,7 @@ sub get_pdbid_info {
     my $result = XMLin( $response->content , KeepRoot => 1);
     my %result = % { $result };
 
-    return % { $result{'molDescription'}{'structureId'} };
+    return $result{'molDescription'}{'structureId'};
 }
 
 sub get_pdbid_file {
@@ -173,6 +172,8 @@ sub parse_blast {
 
     my @blasts;
     my @blast_ids;
+    my @all_pdb_id = @{&get_all_pdbid};
+    my $all_pdb_id = join('|', @all_pdb_id);
 
     while( my $token = $parser->get_token) {
         my $ttype = shift @{ $token };
@@ -189,7 +190,7 @@ sub parse_blast {
                     $parser->get_token;
                     my $blast = $parser->get_token->[1];
                     my $blast_id = substr($blast, 0, 4);
-                    if( length($blast_id) == 4 ) {
+                    if( $blast_id =~ /$all_pdb_id/i ) {
                         push (@blasts, $blast);
                         push (@blast_ids, $blast_id);
                     }
@@ -197,7 +198,7 @@ sub parse_blast {
             }
         }
     }
-    return ([@blast_ids], [@blasts]);
+    return [[@blast_ids], [@blasts]];
 }
 
 sub get_blast {
@@ -206,11 +207,20 @@ sub get_blast {
     if ( ! $kwargs{chain_id} ) { $kwargs{chain_id} = 'A'; }
     if ( ! $kwargs{output_form} ) { $kwargs{output_form} = 'HTML'; }
 
-    my @result = parse_blast( get_raw_blast( $pdb_id, $kwargs{chain_id}, $kwargs{output_form} ) );
-    return @result;
+    my $result = parse_blast( get_raw_blast( $pdb_id, $kwargs{chain_id}, $kwargs{output_form} ) );
+    return $result;
 }
+my $result;
+$result = make_search_query('actin');
+# $result = search(make_search_query('actin'));
+# $result = search_protsym('C9');
+# $result = get_pdbid_info('4lza');
+# $result = get_pdbid_file('4lza');
+# $result = get_raw_blast('4lza', output_form=>'xml', chain_id=>'B');
+# $result = get_blast('4lza');
+print Dumper $result;
 
-get_blast('4LZA', chain_id=>'A', output_form=>'html');
+#get_blast('4LZA', chain_id=>'A', output_form=>'html');
 #print get_pdbid_info('4LZA');
 
 1;
