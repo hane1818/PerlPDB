@@ -134,8 +134,8 @@ sub get_pdbid_file {
     # Get the full PDB file associated with a PDB_ID
     my ($pdb_id, %kwargs) = @_;
     if( ! $kwargs{file_type} or $kwargs{file_type} !~ /^(pdb|cif|xml|structfact)$/i ) { $kwargs{file_type} = 'pdb'; }
-    if( ! $kwargs{compression} or $kwargs{compression} =~ /^(true|yes|y|t)$/i ) { $kwargs{compression} = 'YES'; }
-    else { $kwargs{compression} = 'NO'; }
+    if( ! $kwargs{compression} or $kwargs{compression} !~ /^(true|yes|y|t)$/i ) { $kwargs{compression} = 'NO'; }
+    else { $kwargs{compression} = 'YES'; }
 
     my $url = URI->new( 'http://www.rcsb.org/pdb/download/downloadFile.do' );
     $url->query_form( 'fileFormat' => $kwargs{file_type},
